@@ -1,0 +1,45 @@
+/* PEDIDOS COM CORTE DE PRODUTOS 24/10/2022  SOMADO POR PRODUTO*/
+  SELECT CODEMP,
+         CODPROD,
+         SUM (QT_VENDIDO) AS TOTAL_QT_VENDIDO,
+         CODVOL,
+         SUM (QT_CORTE) AS TOTAL_QT_CORTE
+    FROM (SELECT CAB.CODEMP,
+                 CAB.NUNOTA AS NUM_UNICO,
+                 CAB.NUMNOTA AS NUM_NOTA,
+                 CAB.CODVEND AS VENDEDOR,
+                 CAB.CODPARC AS PARCEIRO,
+                 ITE.CODPROD,
+                 FC_QTDALT_HL (ITE.codprod, ITE.qtdneg, ITE.CODVOL)
+                    AS QT_VENDIDO,
+                 ITE.CODVOL,
+                 FC_QTDALT_HL (ITE.codprod, ITE.qtdconferida, ITE.CODVOL)
+                    AS QT_CORTE
+            FROM TGFCAB CAB INNER JOIN tgfite ITE ON CAB.nunota = ITE.nunota
+           WHERE     (    (CAB.DTNEG >= :P_PERIODO.INI)
+                      AND (CAB.DTNEG <= :P_PERIODO.FIN))
+                 AND ITE.qtdconferida > 0
+                 AND CAB.CODTIPOPER IN (1000, 1010))
+GROUP BY CODEMP, CODPROD, CODVOL
+ORDER BY 1, 2, 3
+
+
+
+
+
+
+/* PEDIDOS COM CORTE DE PRODUTOS 24/10/2022 DETALHADO ITEM POR NOTA*/
+SELECT CAB.CODEMP,
+       CAB.NUNOTA AS NUM_UNICO,
+       CAB.NUMNOTA AS NUM_NOTA,
+       CAB.CODVEND AS VENDEDOR,
+       CAB.CODPARC AS PARCEIRO,
+       ITE.CODPROD,
+       FC_QTDALT_HL (ITE.codprod, ITE.qtdneg, ITE.CODVOL) AS QT_VENDIDO,
+       ITE.CODVOL,
+       FC_QTDALT_HL (ITE.codprod, ITE.qtdconferida, ITE.CODVOL) AS QT_CORTE
+  FROM TGFCAB CAB INNER JOIN tgfite ITE ON CAB.nunota = ITE.nunota
+ WHERE     ( (CAB.DTNEG >= :P_PERIODO.INI) AND (CAB.DTNEG <= :P_PERIODO.FIN))
+       AND ITE.qtdconferida > 0
+       AND CAB.CODTIPOPER IN (1000, 1010)
+       AND ITE.CODPROD = :A_CODPROD
