@@ -1,5 +1,5 @@
 
-/*Consulta Notas Comodato com ICMS INDEVIDO 20102022/
+/*Consulta Notas Comodato com ICMS INDEVIDO 03112022/
 SELECT DISTINCT TGFCAB.CODEMP AS EMPRESA,
                 TGFCAB.NUNOTA AS NUM_UNICO,
                 TGFCAB.NUMNOTA AS NUM_NOTA,
